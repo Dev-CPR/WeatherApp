@@ -217,5 +217,5 @@ The app integrates with **OpenWeather API** to fetch:
 
 ---
 
-**Note**: Being only contributor I have put all code in master branch.
+**Note**: Being only contributor I have put all code in main branch.
 
