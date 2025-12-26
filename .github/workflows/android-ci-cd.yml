@@ -58,7 +58,7 @@ jobs:
 
       # 8️⃣ Build Release APK
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
       # 9️⃣ Install Firebase CLI
       - name: Install Firebase CLI
@@ -70,7 +70,7 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           firebase appdistribution:distribute \
-            app/build/outputs/apk/release/app-release.apk \
+            app/build/outputs/apk/debug/app-debug.apk \
             --app 1:124401833328:android:0f8aeb96686cd978276bb5 \
             --groups testers \
             --release-notes "CI/CD automated build from GitHub Actions"
