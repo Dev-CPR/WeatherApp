@@ -57,7 +57,7 @@ jobs:
         run: ./gradlew testDebugUnitTest
 
       # 8️⃣ Build Release APK
-      - name: Build Release APK
+      - name: Build Debug APK
         run: ./gradlew assembleDebug
 
       # 9️⃣ Install Firebase CLI
