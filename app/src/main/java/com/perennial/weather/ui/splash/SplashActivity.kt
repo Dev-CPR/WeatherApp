@@ -1,6 +1,9 @@
 package com.perennial.weather.ui.splash
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -25,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
 import com.perennial.weather.R
 import com.perennial.weather.ui.home.HomeViewModel
@@ -59,6 +63,16 @@ class SplashActivity : ComponentActivity() {
     }
 
     private fun getLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "${R.string.provide_location_permission}", Toast.LENGTH_SHORT).show()
+        }
         locationManager.getCurrentLocation(
             onSuccess = { lat, lon ->
                 homeViewModel.updateLocation(lat, lon)
