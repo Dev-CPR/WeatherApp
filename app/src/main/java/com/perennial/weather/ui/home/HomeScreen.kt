@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -16,12 +17,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.perennial.weather.R
 import com.perennial.weather.ui.home.component.BottomNavigationBar
 import com.perennial.weather.utils.AppLocationManager
 import com.perennial.weather.utils.ErrorConstant
@@ -30,6 +34,7 @@ private const val DEFAULT_COORDINATE = 0.00
 
 @Composable
 fun HomeScreen(
+    navHostController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -43,7 +48,7 @@ fun HomeScreen(
         if (permissions.values.any { it }) {
             locationManagerRef.value?.let { manager ->
                 if (manager.isGpsEnabled()) {
-                    fetchLocation(manager, homeViewModel)
+                    fetchLocation(navHostController,manager, homeViewModel)
                 } else {
                     homeViewModel.updateError(ErrorConstant.GPS_NOT_ENABLED)
                 }
@@ -61,7 +66,7 @@ fun HomeScreen(
 
     val checkAndFetchLocation = {
         if (hasLocationPermission(context) && locationManager.isGpsEnabled()) {
-            fetchLocation(locationManager, homeViewModel)
+            fetchLocation(navHostController, locationManager, homeViewModel)
         } else if (!hasLocationPermission(context)) {
             locationManager.requestLocationPermission()
         }
@@ -76,7 +81,7 @@ fun HomeScreen(
     val handleLocationRequest = {
         when {
             hasLocationPermission(context) && locationManager.isGpsEnabled() ->
-                fetchLocation(locationManager, homeViewModel)
+                fetchLocation(navHostController, locationManager, homeViewModel)
             hasLocationPermission(context) ->
                 context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
             locationManager.isGpsEnabled() ->
@@ -89,6 +94,16 @@ fun HomeScreen(
     val handleRefresh = {
         when {
             hasLocationPermission(context) && locationManager.isGpsEnabled() -> {
+                if (ActivityCompat.checkSelfPermission(
+                        navHostController.context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                        bottomNavController.context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    Toast.makeText(navHostController.context, "${R.string.provide_location_permission}", Toast.LENGTH_SHORT).show()
+                }
                 locationManager.getCurrentLocation(
                     onSuccess = { lat, lon ->
                         homeViewModel.updateLocation(lat, lon)
@@ -147,9 +162,20 @@ private fun hasLocationPermission(context: android.content.Context): Boolean =
     ) == PackageManager.PERMISSION_GRANTED
 
 private fun fetchLocation(
+    navHostController: NavHostController,
     locationManager: AppLocationManager,
     homeViewModel: HomeViewModel
 ) {
+    if (ActivityCompat.checkSelfPermission(
+            navHostController.context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+            navHostController.context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        Toast.makeText(navHostController.context, "${R.string.provide_location_permission}", Toast.LENGTH_SHORT).show()
+    }
     locationManager.getCurrentLocation(
         onSuccess = { lat, lon ->
             homeViewModel.updateLocation(lat, lon)

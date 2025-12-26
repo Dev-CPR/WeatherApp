@@ -17,11 +17,12 @@
     <string name="enter_email">Please enter email</string>
     <string name="enter_valid_email">Please enter valid email</string>
     <string name="enter_password">Please enter password</string>
-    <string name="enter_valid_password">Password should be between 8-16 characters</string>
+    <string name="enter_valid_password">Password should be between 8–16 characters</string>
     <string name="enter_confirm_password">Please enter confirm password</string>
     <string name="enter_valid_confirm_password">Password and confirm password do not match</string>
     <string name="invalid_credentials">Invalid credentials</string>
     <string name="user_already_exists">User already exists with this email</string>
     <string name="error_occurred">An error occurred</string>
     <string name="refresh">Refresh</string>
+    <string name="provide_location_permission">Kindly provide location permission</string>
 </resources>
